@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi"
+      th:replace="layout :: main(~{::content}, 'Chi tiết đơn hàng')">
+<body>
+<div th:fragment="content">
+    <section>
+        <h2>Chi tiết đơn hàng</h2>
+        <p><strong>ID:</strong> <span th:text="${order.id}"></span></p>
+        <p><strong>Khách hàng:</strong> <span th:text="${order.customerName}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${order.customerEmail}"></span></p>
+        <p><strong>Tổng tiền:</strong> <span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}"></span> VND</p>
+        <p><strong>Trạng thái:</strong> <span th:text="${order.status}"></span></p>
+
+        <h3>Sản phẩm</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${order.items}">
+                <td th:text="${item.productName}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="${item.unitPrice}"></td>
+                <td th:text="${item.totalPrice}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <a th:href="@{/orders-page}" class="btn btn-secondary">Quay lại</a>
+    </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi"
+      th:replace="~{layout :: main(~{::body}, ~{::title})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý đơn hàng</title>
+</head>
+<body>
+
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0">Danh sách đơn hàng</h2>
+            <small class="text-muted">Quy trình đặt hàng (Bài 4)</small>
+        </div>
+        <!-- Nút mở modal -->
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal">
+            + Tạo đơn hàng
+        </button>
+    </div>
+
+    <!-- Thông báo thành công / lỗi -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- Bảng danh sách đơn hàng -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Khách hàng</th>
+                        <th>Email</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-end">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="o : ${orders}">
+                        <td th:text="${o.id}"></td>
+                        <td th:text="${o.customerName}"></td>
+                        <td th:text="${o.customerEmail}"></td>
+                        <td th:text="${#numbers.formatDecimal(o.totalAmount, 1, 'COMMA', 2, 'POINT')} + ' VND'"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${o.status == 'COMPLETED' ? ' bg-success' : (o.status == 'CANCELLED' ? ' bg-danger' : ' bg-warning text-dark')}">
+                                <span th:text="${o.status}"></span>
+                            </span>
+                        </td>
+                        <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td class="text-end">
+                            <a th:href="@{'/orders-page/' + ${o.id}}" class="btn btn-sm btn-outline-primary me-1">Chi tiết</a>
+                            <a th:href="@{'/orders-page/delete/' + ${o.id}}" class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Xóa đơn hàng này?');">Xóa</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="7" class="text-center text-muted py-4">Chưa có đơn hàng nào.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal tạo đơn hàng -->
+    <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form th:action="@{/orders-page/create}" th:object="${orderForm}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tạo đơn hàng mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label>Tên khách hàng</label>
+                            <input type="text" th:field="*{customerName}" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Email khách hàng</label>
+                            <input type="email" th:field="*{customerEmail}" class="form-control" required />
+                        </div>
+
+                        <h6>Sản phẩm</h6>
+                        <div th:each="p, iterStat : ${products}" class="row mb-2 align-items-center">
+                            <div class="col-6">
+                                <span th:text="${p.name}"></span>
+                                <input type="hidden" th:field="*{items[__${iterStat.index}__].productId}" th:value="${p.id}" />
+                            </div>
+                            <div class="col-3">
+                                <input type="number" th:field="*{items[__${iterStat.index}__].quantity}" class="form-control" min="0" value="0" />
+                            </div>
+                            <div class="col-3">
+                                <input type="number" th:value="${p.price}" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Tạo đơn hàng</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+</body>
+</html>

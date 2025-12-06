@@ -1,0 +1,64 @@
+<!-- Modal tạo đơn hàng -->
+<div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form th:action="@{/orders-page/create}" th:object="${orderForm}" method="post" class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo đơn hàng mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Thông báo lỗi / thành công -->
+                <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+                <!-- Thông tin khách hàng -->
+                <div class="mb-3">
+                    <label for="customerName" class="form-label">Khách hàng</label>
+                    <input type="text" id="customerName" th:field="*{customerName}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="customerEmail" class="form-label">Email</label>
+                    <input type="email" id="customerEmail" th:field="*{customerEmail}" class="form-control" required>
+                </div>
+
+                <!-- Danh sách sản phẩm -->
+                <h6>Sản phẩm</h6>
+                <div th:each="p, iterStat : ${products}" class="row mb-2 align-items-center">
+                    <div class="col-5">
+                        <span th:text="${p.name}"></span>
+                        <!-- hidden field để map productId vào DTO -->
+                        <input type="hidden" 
+                               th:field="*{items[__${iterStat.index}__].productId}" 
+                               th:value="${p.id}" />
+                    </div>
+                    <div class="col-3">
+                        <!-- số lượng -->
+                        <input type="number" 
+                               th:field="*{items[__${iterStat.index}__].quantity}" 
+                               class="form-control" 
+                               min="0" 
+                               value="0" required />
+                    </div>
+                    <div class="col-4">
+                        <!-- Hiển thị giá sản phẩm, readonly -->
+                        <input type="number" 
+                               step="0.01" 
+                               th:value="${p.price}" 
+                               class="form-control" 
+                               readonly />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Tạo đơn hàng</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+
+        </form>
+    </div>
+</div>
